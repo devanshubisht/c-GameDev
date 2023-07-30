@@ -76,14 +76,16 @@ To modify the generator you're using you must reconfigure your project providing
 You can't simply modify an entry in the CMakeCache.txt file unlike the above options.
 Then you may rebuild your project with this new generator.
 
-## More Reading
+## Learnings
 
-Here are some useful resources if you want to learn more about CMake:
+Here, I use another C++11 feature: the variadic template. As you know, sf::Transformable has two versions of the setPosition() method. The first one takes two float numbers, and the second takes sf::Vector2f as the parameter. Because I don't want to build the two versions, I use a new possibility
+of C++. I simply forward the arguments to sf::Transformable::setPosition() without knowing them. By using this, we can use both of the sf::Transformable:: setPosition() functions.
 
-- [How to Use CMake Without the Agonizing Pain - Part 1](https://alexreinking.com/blog/how-to-use-cmake-without-the-agonizing-pain-part-1.html)
-- [How to Use CMake Without the Agonizing Pain - Part 2](https://alexreinking.com/blog/how-to-use-cmake-without-the-agonizing-pain-part-2.html)
-- [Better CMake YouTube series by Jefferon Amstutz](https://www.youtube.com/playlist?list=PL8i3OhJb4FNV10aIZ8oF0AA46HgA2ed8g)
+Since we don't want to fix the type of parameter (constant, left-reference, or right- reference), we use another feature of C++11: the right value reference or, in this context, the forwarding/universal reference. This allows us to catch any kind of type by simply adding &&. The final signature of the function now is as follows:
+   template<typename ... Args> void setPosition(Args&& ... args);
 
-## License
+In this chapter, we covered the general game architecture, the input management, and the resources. You also learned about the RAII idiom and some C++11 features such as lambda, variadic templates, smart pointers, move syntax,
+and perfect forwarding.
 
-The source code is dual licensed under Public Domain and MIT -- choose whichever you prefer.
+
+

@@ -1,72 +1,106 @@
-#include "game.hpp"
+#include "../include/Game.hpp"
 
-Game::Game() : _window(sf::VideoMode(800, 600), "02_Game_Archi"), _player()
-{
-   //_player.setFillColor(sf::Color::Blue);
-    _player.setPosition(50, 50);
+namespace book {
+Game::Game(int X, int Y)
+    : _window(sf::VideoMode(X, Y), "Asteroid"), X(X), Y(Y) {
+  _player.setPosition(100, 100);
 }
 
-void Game::run(int frame_per_seconds)
-{
-    sf::Clock clock;
-    sf::Time timeSinceLastUpdate = sf::Time::Zero;
-    sf::Time TimePerFrame = sf::seconds(1.f / frame_per_seconds);
-    while (_window.isOpen())
-    {
-        processEvents();
+void Game::runWithFixedTimeSteps(int frame_per_seconds) {
+  sf::Clock clock;
+  sf::Time timeSinceLastUpdate = sf::Time::Zero;
 
-        timeSinceLastUpdate += clock.restart();
-        while (timeSinceLastUpdate > TimePerFrame)
-        {
-            timeSinceLastUpdate -= TimePerFrame;
-            update(TimePerFrame);
-        }
+  sf::Time TimePerFrame = sf::seconds(1.f / frame_per_seconds);
 
-        update(timeSinceLastUpdate);
-        render();
+  while (_window.isOpen()) {
+    processEvents();
+
+    bool repaint = false;
+
+    // fix time delta between frames
+    timeSinceLastUpdate += clock.restart();
+    while (timeSinceLastUpdate > TimePerFrame) {
+      timeSinceLastUpdate -= TimePerFrame;
+      repaint = true;
+      update(TimePerFrame);
     }
+
+    if (repaint)
+      render();
+  }
 }
 
-void Game::processEvents()
-{
-    sf::Event event;
-    while (_window.pollEvent(event))
-    {
-        if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
-        {
-            _window.close();
-        }
-        else if (event.type == sf::Event::KeyPressed)
-        {
-            if (event.key.code == sf::Keyboard::Escape)
-                _window.close();
-            else if (event.key.code == sf::Keyboard::Up)
-                _player.isMoving = true;
-            else if (event.key.code == sf::Keyboard::Left)
-                _player.rotation = -1;
-            else if (event.key.code == sf::Keyboard::Right)
-                _player.rotation = 1;
-        }
-        else if (event.type == sf::Event::KeyReleased)
-        {
-            if (event.key.code == sf::Keyboard::Up)
-                _player.isMoving = false;
-            else if (event.key.code == sf::Keyboard::Left)
-                _player.rotation = 0;
-            else if (event.key.code == sf::Keyboard::Right)
-                _player.rotation = 0;
-        }
+void Game::runWithVariableTimeSteps() {
+  sf::Clock clock;
+
+  while (_window.isOpen()) {
+    processEvents();
+    update(clock.restart());
+    render();
+  }
+}
+
+void Game::runWithMinimumTimeSteps(int minimum_frame_per_seconds) {
+  sf::Clock clock;
+  sf::Time timeSinceLastUpdate;
+  sf::Time TimePerFrame = sf::seconds(1.f / minimum_frame_per_seconds);
+
+  while (_window.isOpen()) {
+    processEvents();
+
+    timeSinceLastUpdate = clock.restart();
+    while (timeSinceLastUpdate > TimePerFrame) {
+      timeSinceLastUpdate -= TimePerFrame;
+      update(TimePerFrame);
     }
+
+    update(timeSinceLastUpdate);
+    render();
+  }
 }
 
-void Game::update(sf::Time deltaTime)
-{
-    // Update game logic here
+void Game::processEvents() {
+  // to store the events
+  sf::Event event;
+  // events loop
+  while (_window.pollEvent(event)) {
+    if (event.type == sf::Event::Closed) // Close window
+      _window.close();
+    else if (event.type == sf::Event::KeyPressed) // keyboard input
+    {
+      if (event.key.code == sf::Keyboard::Escape)
+        _window.close();
+    }
+  }
+
+  _player.processEvents();
 }
 
-void Game::render()
-{
-    _window.clear();
-    _window.draw(_player);
-    _window.display();
+void Game::update(sf::Time deltaTime) {
+  _player.update(deltaTime);
+  sf::Vector2f player_pos = _player.getPosition();
+  if (player_pos.x < 0) {
+    player_pos.x = X;
+    player_pos.y = Y - player_pos.y;
+  } else if (player_pos.x > X) {
+    player_pos.x = 0;
+    player_pos.y = Y - player_pos.y;
+  }
+  if (player_pos.y < 0)
+    player_pos.y = Y;
+  else if (player_pos.y > Y)
+    player_pos.y = 0;
+  _player.setPosition(player_pos);
 }
+void Game::render() {
+  // Clear screen
+  _window.clear();
+
+  // Draw
+  _window.draw(_player);
+
+  // Update the window
+  _window.display();
+}
+
+} // namespace book

@@ -1,10 +1,13 @@
-#include "game.hpp"
-#include <iostream>
+#include "../include/ActionMap.hpp"
+#include "../include/Game.hpp"
 
+#include "../include/Configuration.hpp"
 
-int main(int argc, char *argv[])
-{
-    Game game;
-    game.run(30);
-    return 0;
+int main(int argc, char *argv[]) {
+  book::Configuration::initialize();
+
+  book::Game game;
+  game.runWithMinimumTimeSteps();
+
+  return 0;
 }

@@ -1,35 +1,53 @@
-#include <SFML/Graphics.hpp>
-#include <cmath>
-#include "player.hpp"
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include "../include/Player.hpp"
+#include <cmath> //sin, cos
 
-Player::Player() : _shape(sf::Vector2f(32, 32))
-{
-    _shape.setFillColor(sf::Color::Blue);
-    _shape.setOrigin(16, 16);
+#include "../include/Configuration.hpp" //Configuratio
+
+namespace book {
+Player::Player()
+    : ActionTarget(Configuration::playerInputs), _is_moving(false),
+      _rotation(0) {
+  _ship.setTexture(
+      Configuration::textures.get(Configuration::Textures::Player));
+  _ship.setOrigin(49.5, 37.5);
+
+  bind(Configuration::PlayerInputs::Up,
+       [this](const sf::Event &) { _is_moving = true; });
+
+  bind(Configuration::PlayerInputs::Left,
+       [this](const sf::Event &) { _rotation -= 1; });
+
+  bind(Configuration::PlayerInputs::Right,
+       [this](const sf::Event &) { _rotation += 1; });
 }
 
-void Player::update(sf::Time deltaTime)
-{
-    float seconds = deltaTime.asSeconds();
-    if (rotation != 0)
-    {
-        float angle = (rotation > 0 ? 1 : -1) * 180 * seconds;
-        _shape.rotate(angle);
-        
-    }
-    if (isMoving)
-    {
-        float angle = _shape.getRotation() / 180 * M_PI - M_PI / 2;
-        _velocity += sf::Vector2f(std::cos(angle), std::sin(angle)) *
-                     60.f * seconds;
-    }
-    _shape.move(seconds * _velocity);
+void Player::processEvents() {
+  _is_moving = false;
+  _rotation = 0;
+  ActionTarget::processEvents();
 }
 
-void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const
-{
-    target.draw(_shape, states);
+void Player::update(sf::Time deltaTime) {
+  float seconds = deltaTime.asSeconds();
+
+  if (_rotation != 0) {
+    float angle = _rotation * 180 * seconds;
+    _ship.rotate(angle);
+  }
+
+  if (_is_moving) {
+    float angle = _ship.getRotation() / 180 * M_PI - M_PI / 2;
+    _velocity +=
+        sf::Vector2f(std::cos(angle), std::sin(angle)) * 60.f * seconds;
+  }
+
+  _ship.move(seconds * _velocity);
 }
+
+const sf::Vector2f &Player::getPosition() const { return _ship.getPosition(); }
+
+void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+  target.draw(_ship, states);
+}
+
+} // namespace book
