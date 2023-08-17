@@ -4,33 +4,64 @@
 #include <SFML/Graphics.hpp>
 
 #include "ActionTarget.hpp" //ActionTarget
+#include "Entity.hpp"       //Entity
 
-namespace book {
-class Player : public sf::Drawable, public ActionTarget<int> {
-public:
-  Player(const Player &) = delete;
-  Player &operator=(const Player &) = delete;
+namespace book
+{
+    class Player : public Entity , public ActionTarget<int>
+    {
+        public:
+            Player(const Player&) = delete;
+            Player& operator=(const Player&) = delete;
 
-  Player();
+            Player(World& world);
 
-  template <typename... Args> void setPosition(Args &&...args);
+            virtual bool isCollide(const Entity& other)const;
+            virtual void update(sf::Time deltaTime);
 
-  void processEvents();
+            void processEvents();
 
-  void update(sf::Time deltaTime);
+            void shoot();
 
-  const sf::Vector2f& getPosition() const;
+            void goToHyperspace();
 
-private:
-  virtual void draw(sf::RenderTarget &target,
-                    sf::RenderStates states) const override;
+            virtual void onDestroy();
 
-  sf::Sprite _ship;
-  sf::Vector2f _velocity;
+        private:
 
-  bool _is_moving;
-  int _rotation;
-};
-} // namespace book
-#include "Player.tpl"
+            bool _isMoving;
+            int _rotation;
+
+            sf::Time            _timeSinceLastShoot;
+    };
+}
 #endif
+// namespace book {
+// class Player : public sf::Drawable, public ActionTarget<int> {
+// public:
+//   Player(const Player &) = delete;
+//   Player &operator=(const Player &) = delete;
+
+//   Player();
+
+//   template <typename... Args> void setPosition(Args &&...args);
+
+//   void processEvents();
+
+//   void update(sf::Time deltaTime);
+
+//   const sf::Vector2f& getPosition() const;
+
+// private:
+//   virtual void draw(sf::RenderTarget &target,
+//                     sf::RenderStates states) const override;
+
+//   sf::Sprite _ship;
+//   sf::Vector2f _velocity;
+
+//   bool _is_moving;
+//   int _rotation;
+// };
+// } // namespace book
+// #include "Player.tpl"
+// #endif

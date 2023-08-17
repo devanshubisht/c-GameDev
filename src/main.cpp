@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
   book::Configuration::initialize();
 
   book::Game game;
-  game.runWithMinimumTimeSteps();
+  game.run();
 
   return 0;
 }
