@@ -8,7 +8,7 @@ namespace book
     ResourceManager<sf::SoundBuffer,int> Configuration::sounds;
     ResourceManager<sf::Music,int> Configuration::musics;
 
-    ActionMap<int> Configuration::playerInputs;
+    ActionMap<int> Configuration::playerInputs; // why do i need to give the class the attribute belongs to in the class
     int Configuration::level;
     int Configuration::lives;
 

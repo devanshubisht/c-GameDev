@@ -1,4 +1,4 @@
-#include "../include/Player.hpp"
+    #include "../include/Player.hpp"
 #include <cmath> //sin, cos
 
 #include "../include/Configuration.hpp" //Configuration

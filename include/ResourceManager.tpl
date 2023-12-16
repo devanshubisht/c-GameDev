@@ -6,7 +6,8 @@ template <typename RESOURCE, typename IDENTIFIER>
 template <typename... Args>
 void ResourceManager<RESOURCE, IDENTIFIER>::load(const IDENTIFIER &id,
                                                  Args &&...args) {
-  std::unique_ptr<RESOURCE> ptr(new RESOURCE);
+  auto ptr = std::make_unique<RESOURCE>();
+
   // Because all the SFML resource classes don't have the exact same parameters
   // for the loadFromFile() function (sf::Shader), I decided to use a template
   // that will forward the arguments exactly as Player::setPosition().
